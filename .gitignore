@@ -1,0 +1,238 @@
+# ========================================
+# Environment Variables & Configuration
+# ========================================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+*.local
+
+# ========================================
+# Go / Backend
+# ========================================
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/vendor/
+/bin/
+main
+
+# Test and Coverage
+*.coverprofile
+coverage.out
+coverage.html
+*.coverage
+.testcache/
+
+# Go workspace files
+go.work
+go.work.sum
+
+# Profiling data
+*.prof
+*.pprof
+cpu.prof
+mem.prof
+
+# Air - Live reload for Go
+tmp/
+
+# ========================================
+# Node / Frontend
+# ========================================
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Lock files (keep package-lock.json but ignore alternatives if using npm)
+# Uncomment yarn.lock or pnpm-lock.yaml if you use those instead
+# yarn.lock
+# pnpm-lock.yaml
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.vite/
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+
+# Debug and error logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+.tsbuildinfo
+
+# ========================================
+# IDEs and Editors
+# ========================================
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains IDEs (IntelliJ, GoLand, WebStorm, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+.fleet/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw?
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# ========================================
+# Operating Systems
+# ========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.Trash-*
+
+# ========================================
+# Logs
+# ========================================
+*.log
+logs/
+log/
+*.log.*
+
+# ========================================
+# Databases
+# ========================================
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+
+# PostgreSQL
+/postgres-data/
+/pg_data/
+*.pgdata
+
+# ========================================
+# Docker
+# ========================================
+# Docker volumes and data
+docker-compose.override.yml
+.docker/
+docker-data/
+volumes/
+
+# ========================================
+# Security & Secrets
+# ========================================
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# Credentials
+*credentials*
+*secrets*
+*.asc
+*.gpg
+
+# ========================================
+# Temporary Files
+# ========================================
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+.cache/
+
+# ========================================
+# Build and Release
+# ========================================
+# Release binaries
+/releases/
+*.tar.gz
+*.zip
+
+# ========================================
+# Testing
+# ========================================
+# Test results
+test-results/
+*.test
+.coverage
+
+# ========================================
+# Miscellaneous
+# ========================================
+# Backup files
+*~
+*.orig
+*.rej
+
+# System files
+.sass-cache/
+connect.lock
+typings/
+
+# Package managers
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

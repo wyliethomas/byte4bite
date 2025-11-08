@@ -1,0 +1,7 @@
+Byte 4 Bite is a free and open platform to community pantries of all shapes and sizes. It is designed to allow a community panty to manage and maintain inventory in their pantry in the most easiest and frictionless way possible. 
+
+A pantry coordinate should be able to easily maintain inventory via an admin tool.
+
+Users will get a login where they can create a cart and add items to the cart. Rather than a typical ecomm transaction. When a cart is complete, the pantry operator is able to see what carts need to be fulfilled. They will box the order and set it aside.
+
+The user will go to the pantry and pick up their items.
