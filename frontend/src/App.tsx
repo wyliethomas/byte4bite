@@ -5,11 +5,17 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Profile } from './pages/Profile';
+import { PantriesPage } from './pages/Pantries';
 import { ItemsPage } from './pages/Items';
 import { CartPage } from './pages/Cart';
+import { OrdersPage } from './pages/Orders';
+import { DonatePage } from './pages/Donate';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { AdminCategories } from './pages/admin/Categories';
 import { AdminItems } from './pages/admin/Items';
+import { AdminOrders } from './pages/admin/Orders';
+import { AdminPantries } from './pages/admin/Pantries';
+import { AdminDonations } from './pages/admin/Donations';
 
 function App() {
   return (
@@ -19,6 +25,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/donate" element={<DonatePage />} />
           <Route
             path="/profile"
             element={
@@ -28,6 +35,14 @@ function App() {
             }
           />
           {/* User routes */}
+          <Route
+            path="/pantries"
+            element={
+              <ProtectedRoute>
+                <PantriesPage />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/items"
             element={
@@ -48,7 +63,7 @@ function App() {
             path="/orders"
             element={
               <ProtectedRoute>
-                <div className="p-8">Orders page - Coming in Phase 5</div>
+                <OrdersPage />
               </ProtectedRoute>
             }
           />
@@ -74,6 +89,30 @@ function App() {
             element={
               <ProtectedRoute requireAdmin>
                 <AdminItems />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/orders"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminOrders />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/pantries"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminPantries />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/donations"
+            element={
+              <ProtectedRoute requireAdmin>
+                <AdminDonations />
               </ProtectedRoute>
             }
           />

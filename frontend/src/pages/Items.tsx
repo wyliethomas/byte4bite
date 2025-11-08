@@ -2,22 +2,32 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { itemService } from '../services/itemService';
 import { cartService } from '../services/cartService';
-import type { Item } from '../types';
+import { pantryService } from '../services/pantryService';
+import type { Item, Pantry } from '../types';
 
 export const ItemsPage = () => {
   const [items, setItems] = useState<Item[]>([]);
+  const [selectedPantry, setSelectedPantry] = useState<Pantry | null>(null);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    loadItems();
+    loadPantryAndItems();
   }, [search]);
 
-  const loadItems = async () => {
+  const loadPantryAndItems = async () => {
     try {
       setIsLoading(true);
+
+      // Load selected pantry
+      const pantryId = localStorage.getItem('selectedPantryId');
+      if (pantryId) {
+        const pantry = await pantryService.getPantry(pantryId);
+        setSelectedPantry(pantry);
+      }
+
       const response = await itemService.listPublic({ search, page: 1, page_size: 50 });
       setItems(response.data);
     } catch (err: any) {
@@ -48,11 +58,25 @@ export const ItemsPage = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          <div className="mb-6">
+          <div className="mb-6 flex justify-between items-center">
             <Link to="/" className="text-blue-600 hover:text-blue-500">
               ← Back to Home
             </Link>
+            <Link to="/pantries" className="text-blue-600 hover:text-blue-500">
+              Change Pantry
+            </Link>
           </div>
+
+          {selectedPantry && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-md">
+              <h2 className="text-sm font-medium text-blue-900 mb-1">
+                Shopping at: {selectedPantry.name}
+              </h2>
+              <p className="text-sm text-blue-700">
+                {selectedPantry.city}, {selectedPantry.state}
+              </p>
+            </div>
+          )}
 
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-900">Browse Items</h1>

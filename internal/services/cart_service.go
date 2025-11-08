@@ -236,7 +236,7 @@ func (s *CartService) Checkout(userID uuid.UUID, notes string) (*models.Order, e
 		return nil, errors.New("cart is empty")
 	}
 
-	// Verify all items are still available
+	// Verify all items are still available and reduce inventory
 	for _, cartItem := range cart.Items {
 		item, err := s.itemRepo.FindByID(cartItem.ItemID)
 		if err != nil {
@@ -249,6 +249,18 @@ func (s *CartService) Checkout(userID uuid.UUID, notes string) (*models.Order, e
 
 		if item.Quantity < cartItem.Quantity {
 			return nil, errors.New("insufficient quantity for: " + item.Name)
+		}
+
+		// Reduce inventory quantity
+		item.Quantity -= cartItem.Quantity
+
+		// Mark as unavailable if out of stock
+		if item.Quantity == 0 {
+			item.IsAvailable = false
+		}
+
+		if err := s.itemRepo.Update(item); err != nil {
+			return nil, errors.New("failed to update inventory for: " + item.Name)
 		}
 	}
 

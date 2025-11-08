@@ -20,24 +20,32 @@ func Setup(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 
 	// Initialize repositories
 	userRepo := repositories.NewUserRepository(db)
+	pantryRepo := repositories.NewPantryRepository(db)
 	categoryRepo := repositories.NewCategoryRepository(db)
 	itemRepo := repositories.NewItemRepository(db)
 	cartRepo := repositories.NewCartRepository(db)
 	orderRepo := repositories.NewOrderRepository(db)
+	donationRepo := repositories.NewDonationRepository(db)
 
 	// Initialize services
 	jwtService := auth.NewJWTService(cfg.JWT.Secret, cfg.JWT.ExpiryHours)
 	authService := services.NewAuthService(userRepo, jwtService)
+	pantryService := services.NewPantryService(pantryRepo)
 	categoryService := services.NewCategoryService(categoryRepo)
 	itemService := services.NewItemService(itemRepo)
 	cartService := services.NewCartService(cartRepo, itemRepo)
+	orderService := services.NewOrderService(orderRepo, itemRepo)
+	donationService := services.NewDonationService(donationRepo, pantryRepo)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(authService)
 	userHandler := handlers.NewUserHandler(userRepo)
+	pantryHandler := handlers.NewPantryHandler(pantryService)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
 	itemHandler := handlers.NewItemHandler(itemService)
 	cartHandler := handlers.NewCartHandler(cartService, orderRepo)
+	orderHandler := handlers.NewOrderHandler(orderService)
+	donationHandler := handlers.NewDonationHandler(donationService)
 
 	// Health check endpoint
 	router.GET("/health", func(c *gin.Context) {
@@ -50,10 +58,18 @@ func Setup(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 	// API v1 routes
 	v1 := router.Group("/api/v1")
 	{
-		// Public routes (no authentication required)
-		v1.GET("/pantries", func(c *gin.Context) {
-			c.JSON(http.StatusOK, gin.H{"message": "List pantries - Coming in Phase 6"})
-		})
+		// Public pantry routes (no authentication required)
+		pantries := v1.Group("/pantries")
+		{
+			pantries.GET("", pantryHandler.GetPantries)
+			pantries.GET("/search", pantryHandler.SearchPantries)
+			pantries.GET("/by-city", pantryHandler.GetPantriesByCity)
+			pantries.GET("/by-zip", pantryHandler.GetPantriesByZipCode)
+			pantries.GET("/:id", pantryHandler.GetPantry)
+		}
+
+		// Public donation route (no authentication required)
+		v1.POST("/donations", donationHandler.CreateDonation)
 
 		// Auth routes
 		authRoutes := v1.Group("/auth")
@@ -94,10 +110,13 @@ func Setup(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 				carts.POST("/checkout", cartHandler.Checkout)
 			}
 
-			// Orders routes (coming in Phase 5)
-			protected.GET("/orders", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{"message": "List orders - Coming in Phase 5"})
-			})
+			// Orders routes
+			orders := protected.Group("/orders")
+			{
+				orders.GET("", orderHandler.GetOrders)
+				orders.GET("/:id", orderHandler.GetOrder)
+				orders.DELETE("/:id", orderHandler.CancelOrder)
+			}
 		}
 
 		// Admin routes (admin authentication required)
@@ -133,10 +152,37 @@ func Setup(router *gin.Engine, db *gorm.DB, cfg *config.Config) {
 				items.PATCH("/:id/quantity", itemHandler.UpdateItemQuantity)
 			}
 
-			// Orders routes (coming in Phase 5)
-			admin.GET("/orders", func(c *gin.Context) {
-				c.JSON(http.StatusOK, gin.H{"message": "Admin list orders - Coming in Phase 5"})
-			})
+			// Admin order management routes
+			adminOrders := admin.Group("/orders")
+			{
+				adminOrders.GET("", orderHandler.GetOrders)
+				adminOrders.GET("/:id", orderHandler.GetOrder)
+				adminOrders.PUT("/:id/status", orderHandler.UpdateOrderStatus)
+				adminOrders.PUT("/:id/assign", orderHandler.AssignStaff)
+				adminOrders.DELETE("/:id", orderHandler.CancelOrder)
+			}
+
+			// Admin pantry management routes
+			adminPantries := admin.Group("/pantries")
+			{
+				adminPantries.POST("", pantryHandler.CreatePantry)
+				adminPantries.PUT("/:id", pantryHandler.UpdatePantry)
+				adminPantries.DELETE("/:id", pantryHandler.DeletePantry)
+				adminPantries.PATCH("/:id/toggle", pantryHandler.TogglePantryStatus)
+			}
+
+			// Admin donation management routes
+			adminDonations := admin.Group("/donations")
+			{
+				adminDonations.GET("", donationHandler.GetDonations)
+				adminDonations.GET("/search", donationHandler.SearchDonations)
+				adminDonations.GET("/stats", donationHandler.GetDonationStats)
+				adminDonations.GET("/by-donor", donationHandler.GetDonationsByDonor)
+				adminDonations.GET("/:id", donationHandler.GetDonation)
+				adminDonations.PUT("/:id", donationHandler.UpdateDonation)
+				adminDonations.DELETE("/:id", donationHandler.DeleteDonation)
+				adminDonations.PATCH("/:id/receipt", donationHandler.MarkReceiptSent)
+			}
 		}
 	}
 }

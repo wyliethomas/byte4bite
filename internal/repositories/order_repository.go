@@ -77,3 +77,48 @@ func (r *OrderRepository) CountByPantryID(pantryID uuid.UUID) (int64, error) {
 	err := r.db.Model(&models.Order{}).Where("pantry_id = ?", pantryID).Count(&count).Error
 	return count, err
 }
+
+// FindAll finds all orders with optional filtering
+func (r *OrderRepository) FindAll(status *models.OrderStatus, limit, offset int) ([]models.Order, error) {
+	var orders []models.Order
+	query := r.db.Preload("Cart.Items.Item").Preload("User").Preload("Pantry").Preload("AssignedTo")
+
+	if status != nil {
+		query = query.Where("status = ?", *status)
+	}
+
+	err := query.Order("created_at DESC").
+		Limit(limit).Offset(offset).
+		Find(&orders).Error
+	return orders, err
+}
+
+// CountAll counts all orders with optional status filter
+func (r *OrderRepository) CountAll(status *models.OrderStatus) (int64, error) {
+	var count int64
+	query := r.db.Model(&models.Order{})
+
+	if status != nil {
+		query = query.Where("status = ?", *status)
+	}
+
+	err := query.Count(&count).Error
+	return count, err
+}
+
+// UpdateStatus updates the status of an order
+func (r *OrderRepository) UpdateStatus(id uuid.UUID, status models.OrderStatus) error {
+	return r.db.Model(&models.Order{}).Where("id = ?", id).
+		Update("status", status).Error
+}
+
+// AssignToStaff assigns an order to a staff member
+func (r *OrderRepository) AssignToStaff(id uuid.UUID, staffID uuid.UUID) error {
+	return r.db.Model(&models.Order{}).Where("id = ?", id).
+		Update("assigned_to_id", staffID).Error
+}
+
+// Delete soft deletes an order (for cancellation)
+func (r *OrderRepository) Delete(id uuid.UUID) error {
+	return r.db.Delete(&models.Order{}, "id = ?", id).Error
+}

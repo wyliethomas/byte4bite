@@ -103,6 +103,7 @@ export interface Order {
 export interface Donation {
   id: string;
   pantry_id: string;
+  pantry?: Pantry;
   donor_name: string;
   donor_email?: string;
   donor_phone?: string;
